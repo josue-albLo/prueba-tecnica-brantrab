@@ -88,7 +88,7 @@ export class OfertasService {
     if (motivoRechazo) {
       return {
         id_cliente: cliente.id_cliente,
-        oferta_final: 'Rechazo',
+        oferta_final: 'rechazo',
         limite_tarjeta: null,
         monto_credito: null,
         motivo: motivoRechazo,
@@ -98,7 +98,7 @@ export class OfertasService {
     if (!porcentajeDeuda) {
       return {
         id_cliente: cliente.id_cliente,
-        oferta_final: 'Rechazo',
+        oferta_final: 'rechazo',
         limite_tarjeta: null,
         monto_credito: null,
         motivo:
@@ -138,7 +138,7 @@ export class OfertasService {
   private noEvaluable(id: number, motivo: string): OfferResult {
     return {
       id_cliente: id,
-      oferta_final: 'No evaluable',
+      oferta_final: 'no_evaluable',
       limite_tarjeta: null,
       monto_credito: null,
       motivo,
