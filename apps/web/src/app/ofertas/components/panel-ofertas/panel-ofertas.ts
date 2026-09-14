@@ -135,7 +135,7 @@ export class PanelOfertas {
   cerrarDetalle(): void {
     this.detalleSeleccionado.set(null);
   }
-  descargarCsv(){
-    console.log('descargar')
-  }
+  descargarCsv(): void {
+  window.location.href = 'http://localhost:3000/ofertas/exportar';
+}
 }
