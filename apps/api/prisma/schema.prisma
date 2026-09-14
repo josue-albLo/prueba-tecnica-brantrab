@@ -12,3 +12,20 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Cliente {
+  id_cliente             Int      @id
+  edad                   Int?
+  ingreso_mensual        Decimal? @db.Decimal
+  indice_confiabilidad   Decimal? @db.Decimal
+  mes_en_empleo          Int?
+  productos_contratados  Int?
+  pago_mensual_deudas    Decimal? @db.Decimal
+  dias_atraso            Int?
+  producto_solicitado    String?
+  monto_solicitado       Decimal? @db.Decimal
+  departamento           String?
+  canal                  String?
+
+  @@map("clientes")
+}
