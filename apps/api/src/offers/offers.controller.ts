@@ -2,6 +2,7 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  Header,
   Param,
   ParseIntPipe,
   Query,
@@ -24,5 +25,12 @@ export class OfertasController {
   @Get('evaluar/:id')
   evaluarUno(@Param('id', ParseIntPipe) id: number): Promise<OfferResult> {
     return this.evaluacionesService.evaluarPorId(id);
+  }
+
+  @Get('exportar')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header('Content-Disposition', 'attachment; filename="resultado.csv"')
+  async exportar(): Promise<string> {
+    return '\uFEFF' + (await this.evaluacionesService.exportarCsv());
   }
 }

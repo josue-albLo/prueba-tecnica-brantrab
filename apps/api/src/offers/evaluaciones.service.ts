@@ -47,4 +47,39 @@ export class EvaluacionesService {
 
     return this.ofertasService.evaluarCliente(mapCliente(cliente));
   }
+
+  async exportarCsv(): Promise<string> {
+    const clientes = await this.prisma.cliente.findMany({
+      orderBy: { id_cliente: 'asc' },
+    });
+
+    const cabecera = [
+      'id_cliente',
+      'oferta_final',
+      'limite_tarjeta',
+      'monto_credito',
+      'motivo',
+    ];
+
+    const escapar = (valor: unknown): string => {
+      if (valor == null) return '';
+      const texto = String(valor);
+      return /[",\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
+    };
+
+    const filas = clientes.map((c) => {
+      const r = this.ofertasService.evaluarCliente(mapCliente(c));
+      return [
+        r.id_cliente,
+        r.oferta_final,
+        r.limite_tarjeta ?? '',
+        r.monto_credito ?? '',
+        r.motivo,
+      ]
+        .map(escapar)
+        .join(',');
+    });
+
+    return [cabecera.join(','), ...filas].join('\r\n');
+  }
 }
