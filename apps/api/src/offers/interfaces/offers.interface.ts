@@ -34,3 +34,10 @@ export interface OfferResult {
   monto_credito: number | null;
   motivo: string;
 }
+
+export interface RespuestaPaginada<T> {
+  datos: T[];
+  total: number;
+  limite: number;
+  offset: number;
+}

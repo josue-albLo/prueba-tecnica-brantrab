@@ -7,7 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { EvaluacionesService } from './evaluaciones.service.js';
-import type { OfferResult } from './interfaces/index.js';
+import type { OfferResult, RespuestaPaginada } from './interfaces/index.js';
 
 @Controller('ofertas')
 export class OfertasController {
@@ -17,7 +17,7 @@ export class OfertasController {
   evaluarTodos(
     @Query('limite', new DefaultValuePipe(100), ParseIntPipe) limite: number,
     @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
-  ): Promise<OfferResult[]> {
+  ): Promise<RespuestaPaginada<OfferResult>> {
     return this.evaluacionesService.evaluarTodos(limite, offset);
   }
 

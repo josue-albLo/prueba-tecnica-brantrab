@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type { OfferResult } from './interfaces/index.js';
 import { OfertasService } from './offers.service.js';
 import { mapCliente } from './cliente.mapper.js';
+import type { OfferResult, RespuestaPaginada } from './interfaces/index.js';
 
 @Injectable()
 export class EvaluacionesService {
@@ -11,16 +11,29 @@ export class EvaluacionesService {
     private readonly ofertasService: OfertasService,
   ) {}
 
-  async evaluarTodos(limite = 100, offset = 0): Promise<OfferResult[]> {
-    const clientes = await this.prisma.cliente.findMany({
-      take: limite,
-      skip: offset,
-      orderBy: { id_cliente: 'asc' },
-    });
+  async evaluarTodos(
+    limite = 100,
+    offset = 0,
+  ): Promise<RespuestaPaginada<OfferResult>> {
+    const take = Math.min(Math.max(limite, 1), 1000);
+    const skip = Math.max(offset, 0);
+    const [clientes, total] = await this.prisma.$transaction([
+      this.prisma.cliente.findMany({
+        take,
+        skip,
+        orderBy: { id_cliente: 'asc' },
+      }),
+      this.prisma.cliente.count(),
+    ]);
 
-    return clientes.map((c) =>
-      this.ofertasService.evaluarCliente(mapCliente(c)),
-    );
+    return {
+      datos: clientes.map((c) =>
+        this.ofertasService.evaluarCliente(mapCliente(c)),
+      ),
+      total,
+      limite,
+      offset,
+    };
   }
 
   async evaluarPorId(id: number): Promise<OfferResult> {
