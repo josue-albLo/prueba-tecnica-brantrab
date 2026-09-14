@@ -1,58 +1,146 @@
-<section>
-  <h1>Panel de evaluación</h1>
+<section class="panel-ofertas">
+  <h1 class="panel-ofertas__titulo">Panel de evaluación</h1>
 
-  <button (click)="evaluarTodos()">Evaluar todos los clientes</button>
+  <div class="panel-ofertas__controles controles">
+    <button
+      class="controles__boton controles__boton--primario"
+      (click)="evaluar()"
+      [disabled]="cargando()"
+    >
+      {{ cargando() ? 'Evaluando…' : 'Evaluar clientes' }}
+    </button>
 
-  @if (clickedButton()) {
-    <h3>Resultados de evaluación</h3>
+    <div class="controles__grupo">
+      <label class="controles__etiqueta" for="limite">Registros por página</label>
+      <select
+        class="controles__select"
+        id="limite"
+        [value]="limite()"
+        (change)="cambiarLimite($any($event.target).value)"
+        [disabled]="cargando()"
+      >
+        @for (t of tamaniosPagina; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (consultaRealizada()) {
+    <h3 class="panel-ofertas__subtitulo">Resultados de evaluación</h3>
 
     @if (cargando()) {
-      <p>Cargando resultados...</p>
-    }
+      <p class="panel-ofertas__estado" role="status" aria-live="polite">Cargando resultados…</p>
+    } @else if (error()) {
+      <p class="panel-ofertas__estado panel-ofertas__estado--error" role="alert">
+        {{ error() }}
+      </p>
+    } @else if (totalEnPagina() === 0) {
+      <p class="panel-ofertas__estado panel-ofertas__estado--vacio">
+        No hay más clientes para mostrar.
+      </p>
+    } @else {
+      <p class="panel-ofertas__nota">
+        Resumen de los {{ totalEnPagina() }} clientes de esta página (página {{ paginaActual() }}),
+        no del total de la cartera.
+      </p>
 
-    @if (error()) {
-      <p class="error">{{ error() }}</p>
-    }
-    @if (!cargando() && !error()) {
       <div class="resumen">
-        <div class="card">
-          <span class="numero">{{ totalClientes() }}</span>
-          <span class="etiqueta">Total evaluados</span>
-        </div>
-        <div class="card">
-          <span class="numero">{{ porcentajeAprobados() }}%</span>
-          <span class="etiqueta">Aprobados</span>
-        </div>
-        @for (item of resumenPorOferta() | keyvalue; track item.key) {
-          <div class="card">
-            <span class="numero">{{ item.value }}</span>
-            <span class="etiqueta">{{ item.key }}</span>
-          </div>
+        <article class="resumen__card">
+          <span class="resumen__etiqueta">Evaluados en esta página</span>
+          <span class="resumen__numero">{{ totalEnPagina() }}</span>
+        </article>
+
+        <article class="resumen__card resumen__card--destacada">
+          <span class="resumen__etiqueta">Aprobados</span>
+          <span class="resumen__numero">{{ porcentajeAprobados() }}%</span>
+        </article>
+
+        @for (item of resumenPorOferta(); track item.tipo) {
+          <article class="resumen__card">
+            <span class="resumen__etiqueta">{{ item.etiqueta }}</span>
+            <span class="resumen__numero">{{ item.cantidad }}</span>
+          </article>
         }
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>ID Cliente</th>
-            <th>Oferta</th>
-            <th>Límite Tarjeta</th>
-            <th>Monto Crédito</th>
-            <th>Motivo</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (r of resultados(); track r.id_cliente) {
-            <tr>
-              <td>{{ r.id_cliente }}</td>
-              <td>{{ r.oferta_final }}</td>
-              <td>{{ r.limite_tarjeta ?? '-' }}</td>
-              <td>{{ r.monto_credito ?? '-' }}</td>
-              <td>{{ r.motivo }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+      <div class="tabla">
+        <div class="tabla__scroll">
+          <table class="tabla__elemento">
+            <caption class="tabla__caption visualmente-oculto">
+              Resultados de evaluación crediticia, página
+              {{
+                paginaActual()
+              }}
+            </caption>
+
+            <thead class="tabla__head">
+              <tr>
+                <th class="tabla__th" scope="col">ID Cliente</th>
+                <th class="tabla__th" scope="col">Oferta</th>
+                <th class="tabla__th tabla__th--numerico" scope="col">Límite Tarjeta</th>
+                <th class="tabla__th tabla__th--numerico" scope="col">Monto Crédito</th>
+                <th class="tabla__th" scope="col">Motivo</th>
+                <th class="tabla_th">Acción</th>
+              </tr>
+            </thead>
+
+            <tbody class="tabla__body">
+              @for (r of resultados(); track r.id_cliente) {
+                <tr class="tabla__fila">
+                  <td class="tabla__td tabla__td--id">{{ r.id_cliente }}</td>
+
+                  <td class="tabla__td">
+                    <span class="badge" [class]="'badge--' + r.oferta_final">
+                      {{ etiquetaOferta(r.oferta_final) }}
+                    </span>
+                  </td>
+
+                  <td
+                    class="tabla__td tabla__td--numerico"
+                    [class.tabla__td--vacio]="!r.limite_tarjeta"
+                  >
+                    {{ (r.limite_tarjeta | currency: 'GTQ' : 'symbol' : '1.2-2') || '—' }}
+                  </td>
+
+                  <td
+                    class="tabla__td tabla__td--numerico"
+                    [class.tabla__td--vacio]="!r.monto_credito"
+                  >
+                    {{ (r.monto_credito | currency: 'GTQ' : 'symbol' : '1.2-2') || '—' }}
+                  </td>
+
+                  <td class="tabla__td tabla__td--motivo">{{ r.motivo }}</td>
+                  <td class="tabla_td tabla__td--detalle">Ver detalle</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <nav class="paginacion" aria-label="Paginación de resultados">
+        <button
+          class="paginacion__boton"
+          (click)="paginaAnterior()"
+          [disabled]="!hayPaginaAnterior() || cargando()"
+        >
+          <span aria-hidden="true">←</span> Anterior
+        </button>
+
+        <p class="paginacion__info" role="status" aria-live="polite">
+          Página {{ paginaActual() }} de {{ totalPaginas() }}
+          <span class="paginacion__total">— {{ total() }} clientes</span>
+        </p>
+
+        <button
+          class="paginacion__boton"
+          (click)="paginaSiguiente()"
+          [disabled]="!hayPaginaSiguiente() || cargando()"
+        >
+          Siguiente <span aria-hidden="true">→</span>
+        </button>
+      </nav>
     }
   }
 </section>

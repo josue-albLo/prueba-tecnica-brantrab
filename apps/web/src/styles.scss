@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --fuente-base: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fuente-numeros: 'Inter', ui-monospace, monospace;
+}
+
+body {
+  font-family: var(--fuente-base);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  color: #0f172a;
+}

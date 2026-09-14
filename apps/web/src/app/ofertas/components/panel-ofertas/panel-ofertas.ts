@@ -1,66 +1,119 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
-import { ResultadoOferta } from '../../interfaces/ofertas.interface';
-import { Api } from '../../services/api';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { KeyValuePipe } from '@angular/common';
+
+import { ConteoOferta, ETIQUETAS_OFERTA, ORDEN_OFERTAS, ResultadoOferta, TipoOferta } from '../../interfaces/ofertas.interface';
+import { Api } from '../../services/api';
+
+const OFERTAS_NO_APROBADAS: ReadonlySet<TipoOferta> = new Set(['rechazo', 'no_evaluable']);
+const TAMANIOS_PAGINA = [25, 50, 100, 200,300, 600] as const;
 
 @Component({
-  imports: [KeyValuePipe],
+  imports: [CurrencyPipe],
   selector: 'app-panel-ofertas',
   styleUrl: './panel-ofertas.scss',
   templateUrl: './panel-ofertas.html',
-  
 })
 export class PanelOfertas {
   private readonly api = inject(Api);
   private readonly destroyRef = inject(DestroyRef);
-  resultados = signal<ResultadoOferta[]>([]);
-  readonly cargando = signal<boolean>(false);
-  readonly clickedButton = signal<boolean>(false)
 
-  readonly error = signal<string>('');
+  readonly tamaniosPagina = TAMANIOS_PAGINA;
 
-  readonly totalClientes = computed(() => this.resultados().length);
+  readonly resultados = signal<ResultadoOferta[]>([]);
+  readonly cargando = signal(false);
+  readonly consultaRealizada = signal(false);
+  readonly error = signal('');
 
-  readonly resumenPorOferta = computed<Record<string, number>>(() => {
-    const conteo: Record<string, number> = {};
-    for (const r of this.resultados()) {
-      conteo[r.oferta_final] = (conteo[r.oferta_final] || 0) + 1;
-    }
-    return conteo;
-  });
+  readonly limite = signal(50);
+  readonly offset = signal(0);
 
-  readonly porcentajeAprobados = computed<string>(() => {
-    const total = this.totalClientes();
+  readonly paginaActual = computed(() => Math.floor(this.offset() / this.limite()) + 1);
+
+  readonly totalEnPagina = computed(() => this.resultados().length);
+
+  readonly total = signal(0);
+
+  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.total() / this.limite())));
+
+  readonly hayPaginaSiguiente = computed(() => this.offset() + this.limite() < this.total());
+
+  readonly hayPaginaAnterior = computed(() => this.offset() > 0);
+
+  readonly resumenPorOferta = computed<ConteoOferta[]>(() => {
+  const conteo = new Map<TipoOferta, number>();
+
+  for (const r of this.resultados()) {
+    conteo.set(r.oferta_final, (conteo.get(r.oferta_final) ?? 0) + 1);
+  }
+
+  return ORDEN_OFERTAS
+    .filter((tipo) => conteo.has(tipo))
+    .map((tipo) => ({
+      tipo,
+      etiqueta: ETIQUETAS_OFERTA[tipo],
+      cantidad: conteo.get(tipo)!,
+    }));
+});
+  readonly porcentajeAprobados = computed(() => {
+    const total = this.totalEnPagina();
     if (total === 0) return '0';
+
     const aprobados = this.resultados().filter(
-      (r) =>
-        r.oferta_final.toLowerCase() !== 'rechazo' &&
-        r.oferta_final.toLowerCase() !== 'no evaluable',
+      (r) => !OFERTAS_NO_APROBADAS.has(r.oferta_final),
     ).length;
+
     return ((aprobados / total) * 100).toFixed(1);
   });
 
-  evaluarTodos() {
+  evaluar(): void {
+    this.consultaRealizada.set(true);
+    this.cargar();
+  }
+
+  paginaSiguiente(): void {
+    if (!this.hayPaginaSiguiente()) return;
+    this.offset.update((v) => v + this.limite());
+    this.cargar();
+  }
+
+  paginaAnterior(): void {
+    if (!this.hayPaginaAnterior()) return;
+    this.offset.update((v) => Math.max(0, v - this.limite()));
+    this.cargar();
+  }
+
+  cambiarLimite(valor: string): void {
+    this.limite.set(Number(valor));
+    this.offset.set(0);
+    if (this.consultaRealizada()) this.cargar();
+  }
+
+  private cargar(): void {
     this.error.set('');
     this.cargando.set(true);
-    this.clickedButton.set(true);
+
     this.api
-      .evaluarTodos()
+      .evaluarTodos(this.limite(), this.offset())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => {
-          this.cargando.set(false);
-        }),
+        finalize(() => this.cargando.set(false)),
       )
       .subscribe({
         next: (res) => {
-          this.resultados.set(res);
+          this.resultados.set(res.datos);
+          this.total.set(res.total);
         },
         error: () => {
-          this.error.set('No se pudo concetar con la API. Verifica que exista conexión.');
+          this.resultados.set([]);
+          this.total.set(0);
+          this.error.set('No se pudo conectar con la API. Verifica que exista conexión.');
         },
       });
   }
+
+  etiquetaOferta(tipo: TipoOferta): string {
+  return ETIQUETAS_OFERTA[tipo];
+}
 }
