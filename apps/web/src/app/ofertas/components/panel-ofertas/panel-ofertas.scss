@@ -1,7 +1,6 @@
 $bp-sm: 40rem;
 $bp-md: 48rem;
 
-
 .panel-ofertas {
   padding: 1.5rem;
   max-width: 80rem;
@@ -83,7 +82,9 @@ $bp-md: 48rem;
     font-weight: 500;
     color: #334155;
     cursor: pointer;
-    transition: background-color 150ms ease, border-color 150ms ease;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
 
     &:hover:not(:disabled) {
       background: #f8fafc;
@@ -145,7 +146,6 @@ $bp-md: 48rem;
   }
 }
 
-
 .resumen {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
@@ -205,7 +205,9 @@ $bp-md: 48rem;
 
   @media (hover: hover) {
     &__card {
-      transition: box-shadow 150ms ease, transform 150ms ease;
+      transition:
+        box-shadow 150ms ease,
+        transform 150ms ease;
 
       &:hover {
         box-shadow:
@@ -216,7 +218,6 @@ $bp-md: 48rem;
     }
   }
 }
-
 
 .tabla {
   &__scroll {
@@ -306,12 +307,51 @@ $bp-md: 48rem;
       color: #64748b;
     }
 
+    &--acciones {
+      width: 1%;
+      white-space: nowrap;
+      text-align: right;
+    }
+
     @media (max-width: $bp-md) {
       padding: 0.625rem 0.75rem;
     }
   }
-}
+   &__accion {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding-inline: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: #334155;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
 
+    &:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    &:active {
+      background: #e2e8f0;
+    }
+  }
+}
 
 .paginacion {
   display: flex;
@@ -380,7 +420,6 @@ $bp-md: 48rem;
   }
 }
 
-
 .badge {
   display: inline-block;
   padding: 0.125rem 0.5rem;
@@ -389,13 +428,27 @@ $bp-md: 48rem;
   font-weight: 500;
   white-space: nowrap;
 
-  &--combinado    { background: #dcfce7; color: #166534; }
-  &--tarjeta      { background: #dbeafe; color: #1e40af; }
-  &--credito      { background: #e0e7ff; color: #3730a3; }
-  &--rechazo      { background: #fee2e2; color: #991b1b; }
-  &--no_evaluable { background: #f1f5f9; color: #475569; }
+  &--combinado {
+    background: #dcfce7;
+    color: #166534;
+  }
+  &--tarjeta {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  &--credito {
+    background: #e0e7ff;
+    color: #3730a3;
+  }
+  &--rechazo {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  &--no_evaluable {
+    background: #f1f5f9;
+    color: #475569;
+  }
 }
-
 
 .visualmente-oculto {
   position: absolute;

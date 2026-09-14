@@ -6,6 +6,8 @@ export interface ResultadoOferta {
   limite_tarjeta: number | null;
   monto_credito: number | null;
   motivo: string;
+  detalle: DetalleFinanciero | null;
+  recomendaciones: Recomendacion[];
 }
 
 export interface ParametrosPaginacion {
@@ -28,7 +30,6 @@ export const ETIQUETAS_OFERTA: Record<TipoOferta, string> = {
   no_evaluable: 'No Evaluable',
 };
 
-
 export const ORDEN_OFERTAS: readonly TipoOferta[] = [
   'combinado',
   'tarjeta',
@@ -41,4 +42,23 @@ export interface ConteoOferta {
   tipo: TipoOferta;
   etiqueta: string;
   cantidad: number;
+}
+
+export type Grupo = 'basico' | 'bueno' | 'excelente';
+
+export interface DetalleFinanciero {
+  ingreso_mensual: number;
+  pago_mensual_deudas: number;
+  ratio_deuda: number;
+  capacidad_pago: number;
+  indice_confiabilidad: number;
+  dias_atraso: number;
+  edad: number;
+  grupo: Grupo | null;
+}
+
+export interface Recomendacion {
+  titulo: string;
+  descripcion: string;
+  brecha?: string;
 }

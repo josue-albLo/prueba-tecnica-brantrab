@@ -100,18 +100,27 @@
                     class="tabla__td tabla__td--numerico"
                     [class.tabla__td--vacio]="!r.limite_tarjeta"
                   >
-                    {{ (r.limite_tarjeta | currency: 'GTQ' : 'symbol' : '1.2-2') || '—' }}
+                    {{ (r.limite_tarjeta | currency: 'GTQ ' : 'symbol' : '1.2-2') || '—' }}
                   </td>
 
                   <td
                     class="tabla__td tabla__td--numerico"
                     [class.tabla__td--vacio]="!r.monto_credito"
                   >
-                    {{ (r.monto_credito | currency: 'GTQ' : 'symbol' : '1.2-2') || '—' }}
+                    {{ (r.monto_credito | currency: 'GTQ ' : 'symbol' : '1.2-2') || '—' }}
                   </td>
 
                   <td class="tabla__td tabla__td--motivo">{{ r.motivo }}</td>
-                  <td class="tabla_td tabla__td--detalle">Ver detalle</td>
+                  <td class="tabla__td tabla__td--acciones">
+                    <button
+                      class="tabla__accion"
+                      type="button"
+                      (click)="verDetalle(r)"
+                      [attr.aria-label]="'Ver detalle del cliente ' + r.id_cliente"
+                    >
+                      Ver detalle
+                    </button>
+                  </td>
                 </tr>
               }
             </tbody>
@@ -142,5 +151,8 @@
         </button>
       </nav>
     }
+  }
+  @if (detalleSeleccionado(); as r) {
+    <app-detalle-oferta [resultado]="r" (cerrar)="cerrarDetalle()" />
   }
 </section>

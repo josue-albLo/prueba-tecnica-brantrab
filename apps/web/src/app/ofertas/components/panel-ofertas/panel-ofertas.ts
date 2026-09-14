@@ -3,14 +3,21 @@ import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
-import { ConteoOferta, ETIQUETAS_OFERTA, ORDEN_OFERTAS, ResultadoOferta, TipoOferta } from '../../interfaces/ofertas.interface';
+import {
+  ConteoOferta,
+  ETIQUETAS_OFERTA,
+  ORDEN_OFERTAS,
+  ResultadoOferta,
+  TipoOferta,
+} from '../../interfaces/ofertas.interface';
 import { Api } from '../../services/api';
+import { DetalleOferta } from '../detalle-oferta/detalle-oferta';
 
 const OFERTAS_NO_APROBADAS: ReadonlySet<TipoOferta> = new Set(['rechazo', 'no_evaluable']);
-const TAMANIOS_PAGINA = [25, 50, 100, 200,300, 600] as const;
+const TAMANIOS_PAGINA = [25, 50, 100, 200, 300, 600] as const;
 
 @Component({
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, DetalleOferta],
   selector: 'app-panel-ofertas',
   styleUrl: './panel-ofertas.scss',
   templateUrl: './panel-ofertas.html',
@@ -18,6 +25,7 @@ const TAMANIOS_PAGINA = [25, 50, 100, 200,300, 600] as const;
 export class PanelOfertas {
   private readonly api = inject(Api);
   private readonly destroyRef = inject(DestroyRef);
+  readonly detalleSeleccionado = signal<ResultadoOferta | null>(null);
 
   readonly tamaniosPagina = TAMANIOS_PAGINA;
 
@@ -42,20 +50,18 @@ export class PanelOfertas {
   readonly hayPaginaAnterior = computed(() => this.offset() > 0);
 
   readonly resumenPorOferta = computed<ConteoOferta[]>(() => {
-  const conteo = new Map<TipoOferta, number>();
+    const conteo = new Map<TipoOferta, number>();
 
-  for (const r of this.resultados()) {
-    conteo.set(r.oferta_final, (conteo.get(r.oferta_final) ?? 0) + 1);
-  }
+    for (const r of this.resultados()) {
+      conteo.set(r.oferta_final, (conteo.get(r.oferta_final) ?? 0) + 1);
+    }
 
-  return ORDEN_OFERTAS
-    .filter((tipo) => conteo.has(tipo))
-    .map((tipo) => ({
+    return ORDEN_OFERTAS.filter((tipo) => conteo.has(tipo)).map((tipo) => ({
       tipo,
       etiqueta: ETIQUETAS_OFERTA[tipo],
       cantidad: conteo.get(tipo)!,
     }));
-});
+  });
   readonly porcentajeAprobados = computed(() => {
     const total = this.totalEnPagina();
     if (total === 0) return '0';
@@ -65,6 +71,11 @@ export class PanelOfertas {
     ).length;
 
     return ((aprobados / total) * 100).toFixed(1);
+  });
+
+  readonly tieneProductos = computed(() => {
+    const r = this.detalleSeleccionado();
+    return r !== null && r.oferta_final !== 'rechazo' && r.oferta_final !== 'no_evaluable';
   });
 
   evaluar(): void {
@@ -114,6 +125,14 @@ export class PanelOfertas {
   }
 
   etiquetaOferta(tipo: TipoOferta): string {
-  return ETIQUETAS_OFERTA[tipo];
-}
+    return ETIQUETAS_OFERTA[tipo];
+  }
+
+  verDetalle(resultado: ResultadoOferta): void {
+    this.detalleSeleccionado.set(resultado);
+  }
+
+  cerrarDetalle(): void {
+    this.detalleSeleccionado.set(null);
+  }
 }
