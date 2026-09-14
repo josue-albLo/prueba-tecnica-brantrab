@@ -27,17 +27,36 @@ export type TipoOferta =
 
 export type Grupo = 'basico' | 'bueno' | 'excelente';
 
+export interface RespuestaPaginada<T> {
+  datos: T[];
+  total: number;
+  limite: number;
+  offset: number;
+}
+
+export interface DetalleFinanciero {
+  ingreso_mensual: number;
+  pago_mensual_deudas: number;
+  ratio_deuda: number;
+  capacidad_pago: number;
+  indice_confiabilidad: number;
+  dias_atraso: number;
+  edad: number;
+  grupo: Grupo | null;
+}
+
+export interface Recomendacion {
+  titulo: string;
+  descripcion: string;
+  brecha?: string;
+}
+
 export interface OfferResult {
   id_cliente: number;
   oferta_final: TipoOferta;
   limite_tarjeta: number | null;
   monto_credito: number | null;
   motivo: string;
-}
-
-export interface RespuestaPaginada<T> {
-  datos: T[];
-  total: number;
-  limite: number;
-  offset: number;
+  detalle: DetalleFinanciero | null;
+  recomendaciones: Recomendacion[];
 }
