@@ -1,0 +1,112 @@
+<div class="detalle" (click)="cerrar.emit()" role="dialog" aria-modal="true" aria-labelledby="detalle-titulo">
+  <div (click)="$event.stopPropagation()" class="detalle__panel">
+    <header class="detalle__header">
+      <div>
+        <p class="detalle__eyebrow">Cliente #{{ resultado().id_cliente }}</p>
+        <h2 class="detalle__titulo" id="detalle-titulo">{{ etiqueta() }}</h2>
+      </div>
+      <button class="detalle__cerrar" type="button" (click)="cerrar.emit()" aria-label="Cerrar detalle">
+        &times;
+      </button>
+    </header>
+
+    <div class="detalle__cuerpo">
+      @if (tieneProductos()) {
+      
+        <section class="detalle__seccion">
+          <h3 class="detalle__seccion-titulo">Productos aprobados</h3>
+
+          <div class="productos">
+            @if (resultado().limite_tarjeta) {
+              <article class="productos__item productos__item--tarjeta">
+                <span class="productos__nombre">Tarjeta de crédito</span>
+                <span class="productos__monto">
+                  {{ resultado().limite_tarjeta | currency: 'GTQ ' : 'symbol' : '1.2-2' }}
+                </span>
+                <span class="productos__nota">Límite disponible</span>
+              </article>
+            }
+
+            @if (resultado().monto_credito) {
+              <article class="productos__item productos__item--credito">
+                <span class="productos__nombre">Crédito</span>
+                <span class="productos__monto">
+                  {{ resultado().monto_credito | currency: 'GTQ ' : 'symbol' : '1.2-2' }}
+                </span>
+                <span class="productos__nota">Monto aprobado</span>
+              </article>
+            }
+          </div>
+
+          <p class="detalle__total">
+            Exposición total:
+            <strong>{{ montoTotal() | currency: 'GTQ ' : 'symbol' : '1.2-2' }}</strong>
+          </p>
+        </section>
+      } @else {
+      
+        <section class="detalle__seccion">
+          <div class="aviso aviso--rechazo">
+            <p class="aviso__motivo">{{ resultado().motivo }}</p>
+          </div>
+
+          @if (resultado().recomendaciones.length) {
+            <h3 class="detalle__seccion-titulo">Cómo puede calificar</h3>
+
+            <ul class="recomendaciones">
+              @for (rec of resultado().recomendaciones; track rec.titulo) {
+                <li class="recomendaciones__item">
+                  <h4 class="recomendaciones__titulo">{{ rec.titulo }}</h4>
+                  <p class="recomendaciones__descripcion">{{ rec.descripcion }}</p>
+                  @if (rec.brecha) {
+                    <p class="recomendaciones__brecha">{{ rec.brecha }}</p>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+
+      <!-- ── Perfil financiero (común a ambos) ────────── -->
+      @if (resultado().detalle; as d) {
+        <section class="detalle__seccion">
+          <h3 class="detalle__seccion-titulo">Perfil financiero</h3>
+
+          <dl class="perfil">
+            <div class="perfil__fila">
+              <dt class="perfil__clave">Ingreso mensual</dt>
+              <dd class="perfil__valor">{{ d.ingreso_mensual | currency: 'GTQ ' : 'symbol' : '1.2-2' }}</dd>
+            </div>
+            <div class="perfil__fila">
+              <dt class="perfil__clave">Pago mensual de deudas</dt>
+              <dd class="perfil__valor">{{ d.pago_mensual_deudas | currency: 'GTQ ' : 'symbol' : '1.2-2' }}</dd>
+            </div>
+            <div class="perfil__fila">
+              <dt class="perfil__clave">Porcentaje de deuda</dt>
+              <dd class="perfil__valor">{{ d.ratio_deuda | percent: '1.1-1' }}</dd>
+            </div>
+            <div class="perfil__fila">
+              <dt class="perfil__clave">Capacidad de pago</dt>
+              <dd class="perfil__valor">{{ d.capacidad_pago | currency: 'GTQ ' : 'symbol' : '1.2-2' }}</dd>
+            </div>
+            <div class="perfil__fila">
+              <dt class="perfil__clave">Índice de confiabilidad</dt>
+              <dd class="perfil__valor">{{ d.indice_confiabilidad | number }}</dd>
+            </div>
+            <div class="perfil__fila">
+              <dt class="perfil__clave">Días de atraso</dt>
+              <dd class="perfil__valor">{{ d.dias_atraso }}</dd>
+            </div>
+            @if (d.grupo) {
+              <div class="perfil__fila">
+                <dt class="perfil__clave">Grupo</dt>
+                <dd class="perfil__valor perfil__valor--grupo">{{ d.grupo }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      }
+    </div>
+  </div>
+</div>
