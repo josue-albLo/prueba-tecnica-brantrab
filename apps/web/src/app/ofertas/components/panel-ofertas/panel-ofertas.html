@@ -41,8 +41,8 @@
       </p>
     } @else {
       <p class="panel-ofertas__nota">
-        Resumen de los {{ totalEnPagina() }} clientes de esta página (Página No. {{ paginaActual() }}),
-        no del total de la cartera.
+        Resumen de los {{ totalEnPagina() }} clientes de esta página (Página No.
+        {{ paginaActual() }}), no del total de la cartera.
       </p>
 
       <div class="resumen">
@@ -62,6 +62,29 @@
             <span class="resumen__numero">{{ item.cantidad }}</span>
           </article>
         }
+      </div>
+      <div class="descargar">
+        <div class="descargar__contenedor">
+          <div class="descargar__texto">
+            <p class="descargar__titulo">Exportar resultados</p>
+            <p class="descargar__descripcion">
+              Descarga los {{ totalEnPagina() }} registros evaluados en formato CSV.
+            </p>
+          </div>
+
+          <button class="descargar__boton" type="button" (click)="descargarCsv()">
+            <svg class="descargar__icono" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M8 2v8m0 0L5 7m3 3 3-3M3 12v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Descargar CSV
+          </button>
+        </div>
       </div>
 
       <div class="tabla">

@@ -135,4 +135,7 @@ export class PanelOfertas {
   cerrarDetalle(): void {
     this.detalleSeleccionado.set(null);
   }
+  descargarCsv(){
+    console.log('descargar')
+  }
 }
