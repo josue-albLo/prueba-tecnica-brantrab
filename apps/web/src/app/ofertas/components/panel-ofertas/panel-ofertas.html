@@ -1,0 +1,58 @@
+<section>
+  <h1>Panel de evaluación</h1>
+
+  <button (click)="evaluarTodos()">Evaluar todos los clientes</button>
+
+  @if (clickedButton()) {
+    <h3>Resultados de evaluación</h3>
+
+    @if (cargando()) {
+      <p>Cargando resultados...</p>
+    }
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    @if (!cargando() && !error()) {
+      <div class="resumen">
+        <div class="card">
+          <span class="numero">{{ totalClientes() }}</span>
+          <span class="etiqueta">Total evaluados</span>
+        </div>
+        <div class="card">
+          <span class="numero">{{ porcentajeAprobados() }}%</span>
+          <span class="etiqueta">Aprobados</span>
+        </div>
+        @for (item of resumenPorOferta() | keyvalue; track item.key) {
+          <div class="card">
+            <span class="numero">{{ item.value }}</span>
+            <span class="etiqueta">{{ item.key }}</span>
+          </div>
+        }
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID Cliente</th>
+            <th>Oferta</th>
+            <th>Límite Tarjeta</th>
+            <th>Monto Crédito</th>
+            <th>Motivo</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of resultados(); track r.id_cliente) {
+            <tr>
+              <td>{{ r.id_cliente }}</td>
+              <td>{{ r.oferta_final }}</td>
+              <td>{{ r.limite_tarjeta ?? '-' }}</td>
+              <td>{{ r.monto_credito ?? '-' }}</td>
+              <td>{{ r.motivo }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</section>
