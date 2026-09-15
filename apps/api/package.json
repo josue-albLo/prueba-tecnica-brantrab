@@ -22,6 +22,9 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "node dist/prisma/seed.js"
   },
+  "prisma": {
+    "seed": "node --experimental-strip-types prisma/seed.ts"
+  },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
     "@nestjs/config": "^12.0.0",
