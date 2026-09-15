@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://tu-api.com/ofertas',
+  apiUrl: 'https://nest-typescript-starter-production.up.railway.app/api/ofertas',
 };
