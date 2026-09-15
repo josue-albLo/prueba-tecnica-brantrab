@@ -6,25 +6,22 @@ import {
   RespuestaPaginada,
   ResultadoOferta,
 } from '../interfaces/ofertas.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class Api {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/ofertas';
+  private readonly apiUrl = environment.apiUrl;
 
-  evaluarTodos(
-    limite: number,
-    offset: number,
-  ): Observable<RespuestaPaginada<ResultadoOferta>> {
+  evaluarTodos(limite: number, offset: number): Observable<RespuestaPaginada<ResultadoOferta>> {
     const params = new HttpParams().set('limite', limite).set('offset', offset);
 
-    return this.http.get<RespuestaPaginada<ResultadoOferta>>(
-      `${this.apiUrl}/evaluar-todos`,
-      { params },
-    );
+    return this.http.get<RespuestaPaginada<ResultadoOferta>>(`${this.apiUrl}/evaluar-todos`, {
+      params,
+    });
   }
 
   obtenerMetricas(): Observable<MetricasEvaluacion> {
-  return this.http.get<MetricasEvaluacion>(`${this.apiUrl}/metricas`);
-}
+    return this.http.get<MetricasEvaluacion>(`${this.apiUrl}/metricas`);
+  }
 }
