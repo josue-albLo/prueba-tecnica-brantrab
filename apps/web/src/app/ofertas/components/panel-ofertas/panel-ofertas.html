@@ -2,13 +2,6 @@
   <h1 class="panel-ofertas__titulo">Panel de evaluación</h1>
 
   <div class="panel-ofertas__controles controles">
-    <button
-      class="controles__boton controles__boton--primario"
-      (click)="evaluar()"
-      [disabled]="cargando()"
-    >
-      {{ cargando() ? 'Evaluando…' : 'Evaluar clientes' }}
-    </button>
 
     <div class="controles__grupo">
       <label class="controles__etiqueta" for="limite">Registros por página</label>
@@ -123,14 +116,14 @@
                     class="tabla__td tabla__td--numerico"
                     [class.tabla__td--vacio]="!r.limite_tarjeta"
                   >
-                    {{ (r.limite_tarjeta | currency: 'GTQ ' : 'symbol' : '1.2-2') || '—' }}
+                    {{ (r.limite_tarjeta | currency: 'Q ' : 'symbol' : '1.2-2') || '—' }}
                   </td>
 
                   <td
                     class="tabla__td tabla__td--numerico"
                     [class.tabla__td--vacio]="!r.monto_credito"
                   >
-                    {{ (r.monto_credito | currency: 'GTQ ' : 'symbol' : '1.2-2') || '—' }}
+                    {{ (r.monto_credito | currency: 'Q ' : 'symbol' : '1.2-2') || '—' }}
                   </td>
 
                   <td class="tabla__td tabla__td--motivo">{{ r.motivo }}</td>

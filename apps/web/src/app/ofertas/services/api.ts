@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
+  MetricasEvaluacion,
   RespuestaPaginada,
   ResultadoOferta,
 } from '../interfaces/ofertas.interface';
@@ -22,4 +23,8 @@ export class Api {
       { params },
     );
   }
+
+  obtenerMetricas(): Observable<MetricasEvaluacion> {
+  return this.http.get<MetricasEvaluacion>(`${this.apiUrl}/metricas`);
+}
 }

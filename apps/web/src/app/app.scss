@@ -1,0 +1,64 @@
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 1.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  &__link {
+    position: relative;
+    padding: 1rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 150ms ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0.875rem;
+      bottom: -1px;
+      height: 2px;
+      background: transparent;
+      transition: background-color 150ms ease;
+    }
+
+    &:hover {
+      color: #1e293b;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: -2px;
+      border-radius: 4px;
+    }
+
+    &--activo {
+      color: #0f172a;
+      font-weight: 600;
+
+      &::after {
+        background: #1e293b;
+      }
+    }
+  }
+
+  @media (max-width: 40rem) {
+    padding-inline: 1rem;
+    overflow-x: auto;
+
+    &__link {
+      white-space: nowrap;
+    }
+  }
+}
+
+main {
+  min-height: calc(100vh - 3.5rem);
+  background: #f8fafc;
+}

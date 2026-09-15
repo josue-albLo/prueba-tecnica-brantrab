@@ -1,0 +1,148 @@
+<section class="metricas">
+  <header class="metricas__header">
+    <h1 class="metricas__titulo">Métricas de la cartera</h1>
+    @if (metricas(); as m) {
+      <p class="metricas__fecha">Evaluación sobre {{ m.total_clientes }} solicitudes</p>
+    }
+  </header>
+
+  @if (cargando()) {
+    <p class="metricas__estado" role="status">Calculando métricas…</p>
+  } @else if (error()) {
+    <p class="metricas__estado metricas__estado--error" role="alert">{{ error() }}</p>
+  } @else if (metricas(); as m) {
+    <div class="kpis">
+      <article class="kpi kpi--destacado">
+        <span class="kpi__etiqueta">Tasa de aprobación</span>
+        <span class="kpi__valor">{{ m.porcentaje_aprobacion }}%</span>
+        <span class="kpi__nota">{{ m.aprobados }} de {{ m.total_clientes }} clientes</span>
+      </article>
+
+      <article class="kpi">
+        <span class="kpi__etiqueta">Exposición total</span>
+        <span class="kpi__valor">{{
+          m.exposicion_total | currency: 'Q ' : 'symbol' : '1.2-2'
+        }}</span>
+        <span class="kpi__nota">
+          - Tarjeta {{ m.limite_tarjeta_total | currency: 'Q ' : 'symbol' : '1.2-2' }}
+        </span>
+        <span class="kpi__nota">
+         - Crédito {{ m.monto_credito_total | currency: 'Q ' : 'symbol' : '1.2-2' }}
+        </span>
+      </article>
+
+      <article class="kpi">
+        <span class="kpi__etiqueta">Rechazados</span>
+        <span class="kpi__valor">{{ m.rechazados }}</span>
+        <span class="kpi__nota">{{ m.no_evaluables }} no evaluables por datos</span>
+      </article>
+
+      <article class="kpi">
+        <span class="kpi__etiqueta">Buena capacidad de pago</span>
+        <span class="kpi__valor">{{ m.clientes_buena_capacidad }}</span>
+        <span class="kpi__nota">Capacidad mensual de Q5,000 o más</span>
+      </article>
+    </div>
+
+   
+    <div class="graficas">
+      <article class="grafica">
+        <h2 class="grafica__titulo">Mix de ofertas</h2>
+        <div class="grafica__lienzo">
+          <canvas #canvasMix></canvas>
+        </div>
+      </article>
+
+      <article class="grafica">
+        <h2 class="grafica__titulo">Aprobación por grupo</h2>
+        <div class="grafica__lienzo">
+          <canvas #canvasGrupos></canvas>
+        </div>
+      </article>
+    </div>
+
+   
+    <section class="bloque">
+      <h2 class="bloque__titulo">Perfil de los clientes aprobados</h2>
+      <dl class="perfil-grid">
+        <div class="perfil-grid__item">
+          <dt class="perfil-grid__clave">Ingreso promedio</dt>
+          <dd class="perfil-grid__valor">
+            {{ m.ingreso_promedio_aprobados | currency: 'Q ' : 'symbol' : '1.2-2' }}
+          </dd>
+        </div>
+        <div class="perfil-grid__item">
+          <dt class="perfil-grid__clave">Edad promedio</dt>
+          <dd class="perfil-grid__valor">{{ m.edad_promedio_aprobados | number: '1.2-2' }} años</dd>
+        </div>
+        <div class="perfil-grid__item">
+          <dt class="perfil-grid__clave">Rango de edad</dt>
+          <dd class="perfil-grid__valor">{{ rangoEdad() }}</dd>
+        </div>
+        <div class="perfil-grid__item">
+          <dt class="perfil-grid__clave">Capacidad promedio</dt>
+          <dd class="perfil-grid__valor">
+            {{ m.capacidad_promedio_aprobados | currency: 'Q ' : 'symbol' : '1.2-2' }}
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    
+    <section class="bloque">
+      <h2 class="bloque__titulo">Segmentación por grupo de confiabilidad</h2>
+      <div class="tabla__scroll">
+        <table class="tabla__elemento">
+          <thead class="tabla__head">
+            <tr>
+              <th class="tabla__th" scope="col">Grupo</th>
+              <th class="tabla__th tabla__th--numerico" scope="col">Clientes</th>
+              <th class="tabla__th tabla__th--numerico" scope="col">Aprobados</th>
+              <th class="tabla__th tabla__th--numerico" scope="col">% Aprobación</th>
+              <th class="tabla__th tabla__th--numerico" scope="col">Ingreso prom.</th>
+              <th class="tabla__th tabla__th--numerico" scope="col">Deuda prom.</th>
+              <th class="tabla__th tabla__th--numerico" scope="col">Capacidad prom.</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (g of m.por_grupo; track g.grupo) {
+              <tr class="tabla__fila">
+                <td class="tabla__td tabla__td--grupo">{{ g.grupo }}</td>
+                <td class="tabla__td tabla__td--numerico">{{ g.total }}</td>
+                <td class="tabla__td tabla__td--numerico">{{ g.aprobados }}</td>
+                <td class="tabla__td tabla__td--numerico">{{ g.porcentaje_aprobacion }}%</td>
+                <td class="tabla__td tabla__td--numerico">
+                  {{ g.ingreso_promedio | currency: 'Q ' : 'symbol' : '1.2-2' }}
+                </td>
+                <td class="tabla__td tabla__td--numerico">
+                  {{ g.ratio_deuda_promedio | percent: '1.1-1' }}
+                </td>
+                <td class="tabla__td tabla__td--numerico">
+                  {{ g.capacidad_promedio | currency: 'Q ' : 'symbol' : '1.2-2' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  
+    <section class="bloque">
+      <h2 class="bloque__titulo">Motivos de rechazo más comunes</h2>
+      <ul class="motivos">
+        @for (mo of m.motivos_rechazo; track mo.motivo) {
+          <li class="motivos__item">
+            <div class="motivos__cabecera">
+              <span class="motivos__texto">{{ mo.motivo }}</span>
+              <span class="motivos__cantidad">{{ mo.cantidad }} ({{ mo.porcentaje }}%)</span>
+            </div>
+            <div class="motivos__barra">
+              <div class="motivos__relleno" [style.width.%]="mo.porcentaje"></div>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</section>

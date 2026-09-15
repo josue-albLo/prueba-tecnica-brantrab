@@ -1,10 +1,11 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import {
   ConteoOferta,
+  ConteoResumen,
   ETIQUETAS_OFERTA,
   ORDEN_OFERTAS,
   ResultadoOferta,
@@ -22,7 +23,7 @@ const TAMANIOS_PAGINA = [25, 50, 100, 200, 300, 600] as const;
   styleUrl: './panel-ofertas.scss',
   templateUrl: './panel-ofertas.html',
 })
-export class PanelOfertas {
+export class PanelOfertas implements OnInit {
   private readonly api = inject(Api);
   private readonly destroyRef = inject(DestroyRef);
   readonly detalleSeleccionado = signal<ResultadoOferta | null>(null);
@@ -34,7 +35,7 @@ export class PanelOfertas {
   readonly consultaRealizada = signal(false);
   readonly error = signal('');
 
-  readonly limite = signal(50);
+  readonly limite = signal(25);
   readonly offset = signal(0);
 
   readonly paginaActual = computed(() => Math.floor(this.offset() / this.limite()) + 1);
@@ -49,7 +50,7 @@ export class PanelOfertas {
 
   readonly hayPaginaAnterior = computed(() => this.offset() > 0);
 
-  readonly resumenPorOferta = computed<ConteoOferta[]>(() => {
+  readonly resumenPorOferta = computed<ConteoResumen[]>(() => {
     const conteo = new Map<TipoOferta, number>();
 
     for (const r of this.resultados()) {
@@ -62,6 +63,7 @@ export class PanelOfertas {
       cantidad: conteo.get(tipo)!,
     }));
   });
+
   readonly porcentajeAprobados = computed(() => {
     const total = this.totalEnPagina();
     if (total === 0) return '0';
@@ -78,6 +80,9 @@ export class PanelOfertas {
     return r !== null && r.oferta_final !== 'rechazo' && r.oferta_final !== 'no_evaluable';
   });
 
+  ngOnInit(): void {
+    this.evaluar();
+  }
   evaluar(): void {
     this.consultaRealizada.set(true);
     this.cargar();
