@@ -12,6 +12,7 @@ export const POLITICA = {
   RATIO_DEUDA_BAJA: 0.3,
   FACTOR_CAPACIDAD: 0.4,
   REDONDEO: 100,
+  CAPACIDAD_BUENA: 5_000,
 } as const;
 
 interface Producto {

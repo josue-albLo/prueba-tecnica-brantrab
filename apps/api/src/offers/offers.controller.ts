@@ -8,7 +8,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { EvaluacionesService } from './evaluaciones.service.js';
-import type { OfferResult, RespuestaPaginada } from './interfaces/index.js';
+import type {
+  MetricasEvaluacion,
+  OfferResult,
+  RespuestaPaginada
+} from './interfaces/index.js';
 
 @Controller('ofertas')
 export class OfertasController {
@@ -32,5 +36,10 @@ export class OfertasController {
   @Header('Content-Disposition', 'attachment; filename="resultado.csv"')
   async exportar(): Promise<string> {
     return '\uFEFF' + (await this.evaluacionesService.exportarCsv());
+  }
+
+  @Get('metricas')
+  calcularMetricas(): Promise<MetricasEvaluacion> {
+    return this.evaluacionesService.calcularMetricas();
   }
 }

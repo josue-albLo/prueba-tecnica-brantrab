@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { GRUPOS, POLITICA } from './ofertas.config.js';
 import type {
   ClienteEvaluable,
   ClientInput,
@@ -8,10 +7,10 @@ import type {
   Recomendacion,
   TipoOferta,
 } from './interfaces/index.js';
+import { GRUPOS, POLITICA } from './ofertas.config.js';
 
 type ResultadoValidacion =
   { ok: true; cliente: ClienteEvaluable } | { ok: false; motivo: string };
-
 
 type ResultadoBase = Omit<OfferResult, 'detalle' | 'recomendaciones'>;
 
@@ -65,7 +64,6 @@ export class OfertasService {
       };
     }
 
-  
     if (!grupo) {
       return {
         ...this.resultado(
@@ -92,7 +90,6 @@ export class OfertasService {
     };
   }
 
-
   private validar(c: ClientInput): ResultadoValidacion {
     if (
       c.edad == null ||
@@ -102,7 +99,6 @@ export class OfertasService {
       return { ok: false, motivo: 'Edad inválida' };
     }
 
-   
     if (c.ingreso_mensual == null || c.ingreso_mensual <= 0) {
       return { ok: false, motivo: 'Ingreso mensual inválido' };
     }
@@ -126,7 +122,6 @@ export class OfertasService {
     return { ok: true, cliente: c as ClienteEvaluable };
   }
 
-
   private evaluarRechazo(
     c: ClienteEvaluable,
     ratioDeuda: number,
@@ -144,14 +139,13 @@ export class OfertasService {
     }
 
     if (c.ingreso_mensual < POLITICA.INGRESO_MINIMO) {
-      return `Ingreso menor a Q${POLITICA.INGRESO_MINIMO}.`;
+      return `Ingreso menor a Q ${POLITICA.INGRESO_MINIMO}.`;
     }
 
     if (ratioDeuda > POLITICA.RATIO_DEUDA_MAXIMO) {
       return `Porcentaje de deuda mayor a ${POLITICA.RATIO_DEUDA_MAXIMO * 100}%.`;
     }
 
-   
     if (this.calcularCapacidad(c) <= 0) {
       return 'El cliente no cuenta con capacidad de pago disponible.';
     }
@@ -195,7 +189,6 @@ export class OfertasService {
     };
   }
 
-
   private calcularCapacidad(c: ClienteEvaluable): number {
     return Math.max(
       0,
@@ -226,13 +219,12 @@ export class OfertasService {
     };
   }
 
-  
   private generarRecomendaciones(
     c: ClienteEvaluable,
     ratioDeuda: number,
   ): Recomendacion[] {
     const recs: Recomendacion[] = [];
-    const moneda = (v: number) => `Q${Math.ceil(v).toLocaleString('es-GT')}`;
+    const moneda = (v: number) => `Q ${Math.ceil(v).toLocaleString('es-GT')}`;
 
     if (c.indice_confiabilidad < POLITICA.INDICE_MINIMO) {
       const faltan = POLITICA.INDICE_MINIMO - c.indice_confiabilidad;
@@ -277,7 +269,6 @@ export class OfertasService {
     }
 
     if (ratioDeuda > POLITICA.RATIO_DEUDA_MAXIMO) {
-   
       const pagoMaximo = c.ingreso_mensual * POLITICA.RATIO_DEUDA_MAXIMO;
       const exceso = c.pago_mensual_deudas - pagoMaximo;
       recs.push({
