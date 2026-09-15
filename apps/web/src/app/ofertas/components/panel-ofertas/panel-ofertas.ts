@@ -3,13 +3,13 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
+import { environment } from '../../../../environments/environment.development';
 import {
-  ConteoOferta,
   ConteoResumen,
   ETIQUETAS_OFERTA,
   ORDEN_OFERTAS,
   ResultadoOferta,
-  TipoOferta,
+  TipoOferta
 } from '../../interfaces/ofertas.interface';
 import { Api } from '../../services/api';
 import { DetalleOferta } from '../detalle-oferta/detalle-oferta';
@@ -27,6 +27,7 @@ export class PanelOfertas implements OnInit {
   private readonly api = inject(Api);
   private readonly destroyRef = inject(DestroyRef);
   readonly detalleSeleccionado = signal<ResultadoOferta | null>(null);
+  private readonly apiUrl = environment.apiUrl;
 
   readonly tamaniosPagina = TAMANIOS_PAGINA;
 
@@ -141,6 +142,6 @@ export class PanelOfertas implements OnInit {
     this.detalleSeleccionado.set(null);
   }
   descargarCsv(): void {
-  window.location.href = 'http://localhost:3000/ofertas/exportar';
-}
+    window.location.href =`${this.apiUrl}/exportar`;
+  }
 }
