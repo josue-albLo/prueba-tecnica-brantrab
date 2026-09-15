@@ -3,7 +3,6 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
-import { environment } from '../../../../environments/environment.development';
 import {
   ConteoResumen,
   ETIQUETAS_OFERTA,
@@ -13,6 +12,7 @@ import {
 } from '../../interfaces/ofertas.interface';
 import { Api } from '../../services/api';
 import { DetalleOferta } from '../detalle-oferta/detalle-oferta';
+import { environment } from '../../../../environments/environment';
 
 const OFERTAS_NO_APROBADAS: ReadonlySet<TipoOferta> = new Set(['rechazo', 'no_evaluable']);
 const TAMANIOS_PAGINA = [25, 50, 100, 200, 300, 600] as const;

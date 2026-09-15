@@ -6,8 +6,7 @@ import {
   RespuestaPaginada,
   ResultadoOferta,
 } from '../interfaces/ofertas.interface';
-import { environment } from '../../../environments/environment.development';
-
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({ providedIn: 'root' })
